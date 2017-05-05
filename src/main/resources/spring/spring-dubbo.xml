@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop" xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo" xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+      http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.2.xsd
+        http://code.alibabatech.com/schema/dubbo http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd">
+
+	<!-- 引用dubbo服务 -->
+	<dubbo:application name="br-order-user-controller" />
+	<dubbo:registry protocol="zookeeper" address="${zookeeper.address}" />
+	<!-- <dubbo:reference interface="br.order.service.RoleManageService" id="manageRoleService" /> -->
+	 
+	<!--用户预约系统 -->
+	<dubbo:reference interface="br.order.user.service.empUser.CustomerInfoService" id="customerInfoService" />
+	<dubbo:reference interface="br.order.user.service.empUser.CustomerRegistService" id="customerRegistService" />
+	<dubbo:reference interface="br.order.user.service.empCom.EnterpriseService" id="enterpriseService" />
+	<dubbo:reference interface="br.order.user.service.empComDept.EnterpriseDepService" id="enterpriseDepService" />
+	<dubbo:reference interface="br.order.user.service.empComUser.EnterpriseEmpService" id="enterpriseEmpService" />
+	<dubbo:reference interface="br.order.user.service.empUserRelation.RelationshipService" id="relationshipService" />
+	<!-- 用户首页展示 -->
+	<dubbo:reference interface="br.crm.service.firstdata.OrgFirstDataService" id="orgFirstDataService" />
+	<!-- 图片 -->
+	<dubbo:reference interface="br.crm.service.dict.DictImgService" id="dictImgService" />
+	<!-- 套餐 -->
+	<dubbo:reference interface="br.crm.service.suite.OrgExamSuiteService" id="orgExamSuiteService" />
+	<!-- 门店 -->
+	<dubbo:reference interface="br.crm.service.branch.OrgBranchService" id="orgBranchService" />
+	<!-- 商品詳情 -->
+	<dubbo:reference interface="br.crm.service.InfoDetail.InfoDetailService" id="infoDetailService" />
+	<!-- 购物车 -->
+	<dubbo:reference interface="br.crm.service.customer.cart.CustomerCartService" id="customerCartService" />
+	<dubbo:reference interface="br.crm.service.customer.cart.CustomerCartFeeItemService" id="customerCartFeeItemService" />
+	<dubbo:reference interface="br.crm.service.customer.patient.CustomerPatientService" id="customerPatientService" />
+	<!-- 发送手机短信 -->
+	<dubbo:reference interface="br.crm.service.dict.DictSMSRecordService" id="dictSMSRecordService" />
+
+	<!-- Redis -->
+	<dubbo:reference interface="br.order.redis.redis.RedisService" id="RedisService" />
+	<!-- 轮播图 -->
+	<dubbo:reference interface="br.crm.service.firstdata.FirstImgDataService" id="firstImgDataService" />
+
+	<!-- 用户订单 -->
+	<dubbo:reference interface="br.crm.service.customer.order.CustomerOrderService" id="customerOrderService" />
+	<dubbo:reference interface="br.crm.service.customer.order.CustomerOrderCartService" id="customerOrderCartService" />
+
+	<!-- 套餐门店 -->
+	<dubbo:reference interface="br.crm.service.suite.OrgBranchSuiteService" id="orgBranchSuiteService" />
+	<!-- 订单明细 -->
+	<dubbo:reference interface="br.crm.service.customer.order.CustomerOrderPayInfoService" id="customerOrderPayInfoService" />
+	<!-- 订单状态 -->
+	<dubbo:reference interface="br.crm.service.customer.order.CustomerOrderStatusService" id="customerOrderStatusService" />
+	<!-- 发票类型 -->
+	<dubbo:reference interface="br.crm.service.dict.DictreceipttypeService" id="dictreceipttypeService" />
+	<!-- 邮箱记录 -->
+	<dubbo:reference interface="br.crm.service.dict.DictEmailService" id="dictEmailService" />
+	<!-- 订单支付添加 -->
+	<dubbo:reference interface="br.crm.service.customer.order.CustomerOrderPayNoticeService" id="customerOrderPayNoticeService" />
+	<!-- 订单退款明细添加 -->
+	<dubbo:reference interface="br.crm.service.customer.order.CustomerOrderRefundService" id="customerOrderRefundService" />
+	<!-- WX接口 -->
+	<dubbo:reference interface="br.crm.service.customer.order.wxpay.WxpayService" id="wxpayService" />
+	<!-- 机构等级 -->
+	<dubbo:reference interface="br.crm.service.org.OrgLevelService" id="orgLevelService" />
+	<!-- 套餐类型 -->
+	<dubbo:reference interface="br.crm.service.dict.DictExamSuiteTypeService" id="dictExamSuiteTypeService" />
+	<!-- 高发疾病 -->
+	<dubbo:reference interface="br.crm.service.dict.DictHighIncidenceDiseaseService" id="dictHighIncidenceDiseaseService" />
+	<!-- 性别-->
+	<dubbo:reference interface="br.crm.service.dict.DictsexService" id="dictsexService" />
+	<!-- 人际关系-->
+	<dubbo:reference interface="br.order.user.service.dict.DictRelationshipService" id="dictRelationshipService" />
+	<!-- 省市区-->
+	<dubbo:reference interface="br.crm.service.dict.DictAreaService" id="dictAreaService" />
+
+
+</beans>
+

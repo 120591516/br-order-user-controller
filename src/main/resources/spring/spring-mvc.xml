@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:dubbo="http://code.alibabatech.com/schema/dubbo" xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+      http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.2.xsd
+        http://code.alibabatech.com/schema/dubbo http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd">
+
+	<!-- 加载属性文件 -->
+
+	<!-- 它背后注册了很多用于解析注解的处理器,其中就包括<context:annotation-config/>配置的注解所使用的处理器 -->
+	<!-- 所以配置了<context:component-scan base-package="">之后,便无需再配置<context:annotation-config> -->
+	<context:component-scan base-package="br.order.user">
+		<context:include-filter type="annotation"
+			expression="org.springframework.stereotype.Controller" />
+		<context:include-filter type="annotation"
+			expression="org.springframework.web.bind.annotation.ControllerAdvice" />
+	</context:component-scan>
+
+	<!-- 启用SpringMVC的注解功能,它会自动注册HandlerMapping、HandlerAdapter、ExceptionResolver的相关实例 -->
+	<mvc:annotation-driven  conversion-service="conversionService"/>
+	
+	<!-- 转换器的配置 -->
+	 <bean id="conversionService"
+		class="org.springframework.format.support.FormattingConversionServiceFactoryBean">
+		<property name="converters">
+			<set>
+				<bean class="br.order.user.converter.DateConverter"></bean>
+			</set>
+		</property>
+	</bean> 
+
+	<!-- SpringMVC在超出上传文件限制时，会抛出org.springframework.web.multipart.MaxUploadSizeExceededException -->
+	<!-- 该异常是SpringMVC在检查上传的文件信息时抛出来的，而且此时还没有进入到Controller方法中 -->
+	<bean
+		class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+		<property name="exceptionMappings">
+			<props>
+				<!-- 遇到MaxUploadSizeExceededException异常时，自动跳转到/WEB-INF/error_fileupload.jsp页面 -->
+				<prop
+					key="org.springframework.web.multipart.MaxUploadSizeExceededException">WEB-INF/error_fileupload</prop>
+				<!-- 处理其它异常(包括Controller抛出的) -->
+				<prop key="java.lang.Throwable">WEB-INF/500</prop>
+			</props>
+		</property>
+	</bean>
+
+	<!-- 开启AOP监听 只对当前配置文件有效 -->
+	<aop:aspectj-autoproxy expose-proxy="true" />
+
+	<!--controller层增加aop -->
+	<aop:aspectj-autoproxy proxy-target-class="true" />
+
+	<!-- 国际化支持 -->
+	<bean id="messageSource"
+		class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+		<property name="basenames">
+			<list>
+				<value>classpath:message_zh_CN</value>
+			</list>
+		</property>
+		<property name="cacheSeconds" value="300" />  <!--300秒刷新一次 -->
+		<property name="defaultEncoding" value="UTF-8"></property>
+	</bean>
+
+	<!-- 注入SpringSwaggerConfig对象 -->
+	<bean class="com.mangofactory.swagger.configuration.SpringSwaggerConfig" />
+	<!-- 所有swagger目录的访问，直接访问location指定的目录 -->
+	<mvc:resources mapping="/swagger/**" location="/WEB-INF/swagger/" />
+
+	<mvc:interceptors> 
+		<mvc:interceptor>  
+            <!-- 需拦截的地址 -->   
+            <mvc:mapping path="/alipay/*" />  					<!-- 支付宝支付 -->
+            <mvc:mapping path="/alipayRefund/*" />  			<!-- 支付宝退款 --> 
+            <mvc:mapping path="/payResult/*" /> 				<!-- 接口通知-->
+             <mvc:mapping path="/wxpay/*" /> 					<!-- 微信支付--> 
+            <mvc:mapping path="/wx/*" /> 						<!-- 微信随机字符串-->
+            <mvc:mapping path="/customerCart/*" /> 				<!-- 用户购物车-->
+            <mvc:mapping path="/customerOrderCustomer/*" /> 	<!-- 个人订单-->
+            <mvc:mapping path="/customerOrderEnterprise/*" /> 	<!-- 企业订单-->
+            <mvc:mapping path="/customerOrderPayInfoCustomer/*" />	<!-- 个人消费记录-->
+            <mvc:mapping path="/customerOrderPayInfoEnterprise/*"/> <!-- 企业消费记录-->
+            <mvc:mapping path="/customerOrderStatus/*" />       <!-- 查询所有订单状态-->
+            <mvc:mapping path="/enterprise/*" />                <!--注册企业信息-->
+            <mvc:mapping path="/enterpriseDep/*" />             <!--企业部门-->
+            <mvc:mapping path="/enterpriseEmp/*" />             <!--企业员工-->
+            <mvc:mapping path="/customersRegist/*" />           <!--注册用户列表-->
+            <mvc:mapping path="/relationship/*" />              <!--关系成员-->  
+            <mvc:mapping path="/customerInfo/*" />              <!--个人详情页-->  
+            
+            <!-- 不需要拦截的地址 -->  
+            <mvc:exclude-mapping path="/order/pages/system/*.html"/>  <!-- 登录相关 -->
+            <mvc:exclude-mapping path="/infodetail/*"/>               <!-- 门店/套餐详情页 -->
+            <mvc:exclude-mapping path="/userFirstImgData/*"/>         <!-- 首页展示 图片-->
+            <mvc:exclude-mapping path="/userFirstData/*"/>            <!-- 首页展示内容  -->
+            <mvc:exclude-mapping path="/searchData/*"/>               <!--套餐/门店列表 -->
+            <mvc:exclude-mapping path="/login/*"/>                    <!--登录个人/企业-->
+            <mvc:exclude-mapping path="/authImageController/*"/>      <!--验证码-->
+            <mvc:exclude-mapping path="/organizationLevel/*"/>        <!--医院等级信息展示  -->
+            <mvc:exclude-mapping path="/examSuiteType/*"/>            <!--套餐类型  -->
+            <mvc:exclude-mapping path="/highIncidenceDisease/*"/>     <!--高发疾病  -->
+            <mvc:exclude-mapping path="/dictArea/*"/>                 <!-- 地址类 -->
+            <mvc:exclude-mapping path="/dictsex/*"/>                  <!-- 获取性别信息 -->
+            <mvc:exclude-mapping path="/dictrelationship/*"/>         <!-- 关系列表 --> 
+            
+            <bean class="br.order.user.controller.filter.SysInfoFilter"></bean>
+            
+		</mvc:interceptor>
+	</mvc:interceptors>
+	<bean
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/" />
+		<property name="suffix" value=".jsp" />
+	</bean>
+
+	<!-- 控制器异常处理 -->
+	<bean id="exceptionHandlerExceptionResolver"
+		class="org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver" />
+
+	<!-- 测试环境 -->
+	<beans profile="test">
+		<context:property-placeholder order="1"
+			location="classpath:resource/resource-test.properties"
+			ignore-unresolvable="true" />
+		<bean id="log4jInitialization"
+			class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+			<property name="targetClass" value="org.springframework.util.Log4jConfigurer" />
+			<property name="targetMethod" value="initLogging" />
+			<property name="arguments">
+				<list>
+					<value>classpath:resource/log4j-test.properties</value>
+				</list>
+			</property>
+		</bean>
+	</beans>
+
+	<!-- 生产环境 -->
+	<beans profile="production">
+		<context:property-placeholder order="1"
+			location="classpath:resource/resource-production.properties"
+			ignore-unresolvable="true" />
+		<bean id="log4jInitialization"
+			class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+			<property name="targetClass" value="org.springframework.util.Log4jConfigurer" />
+			<property name="targetMethod" value="initLogging" />
+			<property name="arguments">
+				<list>
+					<value>classpath:resource/log4j-production.properties</value>
+				</list>
+			</property>
+		</bean>
+	</beans>
+
+</beans>
